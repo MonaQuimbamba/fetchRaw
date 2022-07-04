@@ -5,6 +5,13 @@ Requirements :
 Scapy
 $ git clone https://github.com/secdev/scapy
 $ cd scapy
-Pour mettre à jour, il suffira de faire la procédure suivante :
 $ git pull
-$ sudo python setup.py instal
+$ sudo python3 setup.py install
+
+
+ pip3 install -r requirements.txt
+
+
+ python3 -m pip install pyfiglet
+
+  python3 -m pip install termcolor
