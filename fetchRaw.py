@@ -27,9 +27,21 @@ def main():
     print(colored(custom_fig.renderText('fetchRaw'),color="blue"))
     print(banner)
 
+def checkPaket():
+    print(" only cap and not pcap")
 
-def fetch():
-    pkts = rdpcap("ch1.pcap")
+def fetch(file,protocol,motif):
+    pkts = rdpcap(file)
+    for pkt in [p for p  in pkts if TCP in p]:
+        if Raw in pkt:
+            data = pkt[Raw]
+            print(colored(data,color="white"))
 if __name__ == "__main__":
     main()
-    fetch()
+    parser = argparse.ArgumentParser()
+    parser.add_argument("-f","--file", help="packet captured [ex bgplu.cap] ", required=True)
+    parser.add_argument('-p','--protocol' , help = 'The Protocol we want pull the data [ex : TCP]' , required=True)
+    args = parser.parse_args()
+    argsdict = vars(args)
+
+    fetch(argsdict['file'],argsdict['protocol'],"")
