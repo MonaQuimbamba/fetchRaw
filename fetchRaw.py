@@ -27,21 +27,47 @@ def main():
     print(colored(custom_fig.renderText('fetchRaw'),color="blue"))
     print(banner)
 
-def checkPaket():
-    print(" only cap and not pcap")
+def checkPaket(argsdict):
+    capname = argsdict['file']
+    x = re.search("\.cap$", capname)
+    if x:
+      return True
+    else:
+      custom_fig = Figlet(font='ntgreek')
+      print(colored('The packet must be .cap',color="red"))
 
-def fetch(file,protocol,motif):
-    pkts = rdpcap(file)
-    for pkt in [p for p  in pkts if TCP in p]:
+
+def fetch(file,protocol,type):
+    if type==2:
+        pkts=file
+        protocol="ETHERNET"
+    else:
+        pkts = rdpcap(file)
+        pkts =[p for p  in pkts if protocol in p]
+    i=0
+    for pkt in pkts:
         if Raw in pkt:
             data = pkt[Raw]
+            custom_fig = Figlet(font='mini')
+            print(colored(custom_fig.renderText('pkt ['+str(i)+']'),color="red"))
             print(colored(data,color="white"))
+            i+=1
+    if i==0:
+        print(colored(" Probably there isn't data in this protocol",color="blue"))
+
 if __name__ == "__main__":
     main()
     parser = argparse.ArgumentParser()
-    parser.add_argument("-f","--file", help="packet captured [ex bgplu.cap] ", required=True)
-    parser.add_argument('-p','--protocol' , help = 'The Protocol we want pull the data [ex : TCP]' , required=True)
+    parser.add_argument("-f","--file", help="packet captured [ex bgplu.cap] ", required=False)
+    parser.add_argument('-p','--protocol' , help = 'The Protocol we want pull the data [ex : TCP]' , required=False)
+    parser.add_argument('-e','--ethernet' , help = 'There is an ethernet trame ? [ex : "true"]' , required=False)
     args = parser.parse_args()
     argsdict = vars(args)
-
-    fetch(argsdict['file'],argsdict['protocol'],"")
+    if argsdict['ethernet']=="true":
+        print(colored(" Paste the HexCap here and after press  Enter twice",color="white"))
+        pkt_hex = Ether(import_hexcap())
+        fetch(pkt_hex,argsdict['protocol'],2)
+    else:
+        if argsdict['file']:
+            if checkPaket(argsdict):
+                fetch(argsdict['file'],argsdict['protocol'],3)
